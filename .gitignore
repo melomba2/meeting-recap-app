@@ -1,9 +1,17 @@
-# Environment variables
+# ============================================================================
+# ENVIRONMENT & CONFIGURATION
+# ============================================================================
 .env
 .env.local
 .env.*.local
+.env.production
+credentials.json
+secrets.yml
+secrets.json
 
-# Python
+# ============================================================================
+# PYTHON
+# ============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -31,37 +39,59 @@ venv/
 .venv/
 env/
 .env/
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
 
-# Logs
-logs
-*.log
+# ============================================================================
+# NODE & NPM
+# ============================================================================
+node_modules/
+dist/
+dist-ssr/
+*.local
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Node
-node_modules
-dist
-dist-ssr
-*.local
-
-# Tauri
+# ============================================================================
+# RUST & TAURI
+# ============================================================================
 src-tauri/target/
+Cargo.lock
+*.rlib
+*.rmeta
 
-# Output directories
-transcripts/
-analysis/
-recaps/
-output/
+# ============================================================================
+# BUILD ARTIFACTS
+# ============================================================================
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
 
-# Editor directories and files
+# ============================================================================
+# IDE & EDITOR
+# ============================================================================
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
+.codeintel/
+.vscode-server/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
 .DS_Store
-.vscode/
+.AppleDouble/
+.LSOverride/
 *.suo
 *.ntvs*
 *.njsproj
@@ -69,10 +99,68 @@ output/
 *.sw?
 *.iml
 
-# OS
+# ============================================================================
+# OPERATING SYSTEM
+# ============================================================================
 Thumbs.db
+desktop.ini
 .DS_Store
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+$RECYCLE.BIN/
 
-# Large binary files
+# ============================================================================
+# APPLICATION OUTPUT & TEMP FILES
+# ============================================================================
+transcripts/
+analysis/
+recaps/
+output/
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# ============================================================================
+# LARGE BINARY FILES
+# ============================================================================
 ffmpeg
 ffmpeg.zip
+*.zip
+*.tar.gz
+*.rar
+
+# ============================================================================
+# DEVELOPER CONTEXT & DOCUMENTATION
+# (These are helpful during development but not needed in the published repo)
+# ============================================================================
+Workflow/
+AGENTS.md
+CLAUDE.md
+CLAUDE\ copy.md
+GEMINI.md
+GEMINI\ copy.md
+GETTING_STARTED.md
+DESKTOP_APP_TESTING.md
+TRANSCRIPTION_DEBUG.md
+FFMPEG_SETUP.md
+REMOTE_WHISPER_SETUP.md
+debug_transcription.py
+test.py
+whisper-test.py
+get-pip.py
+presentation/
+.claude/
+
+# ============================================================================
+# SYSTEM & MISC
+# ============================================================================
+*.pyc
+*.pyo
+.cache/
+__pycache__
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
