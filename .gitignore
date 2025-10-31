@@ -72,3 +72,7 @@ output/
 # OS
 Thumbs.db
 .DS_Store
+
+# Large binary files
+ffmpeg
+ffmpeg.zip
