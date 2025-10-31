@@ -1,0 +1,20 @@
+{
+  "name": "meeting-recap-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite & npm run tauri dev",
+    "build": "vite build",
+    "tauri": "source ~/.cargo/env && tauri",
+    "tauri:dev": "tauri dev --verbose",
+    "tauri:build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "vite": "^7.1.12"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "whisper": {
+    "mode": "local",
+    "model": "medium",
+    "device": "cuda",
+    "language": "en",
+    "remoteHost": "http://localhost:9000"
+  },
+  "ollama": {
+    "host": "http://localhost:11434",
+    "model": "gemma3n:latest"
+  },
+  "recap": {
+    "defaultStyle": "epic",
+    "styles": ["epic", "casual", "dramatic", "narrative"]
+  },
+  "output": {
+    "baseDir": "~/Documents/Meeting Recaps",
+    "transcriptsDir": "transcripts",
+    "analysisDir": "analysis",
+    "recapsDir": "recaps"
+  },
+  "files": {
+    "maxSizeMB": 1024,
+    "supportedAudioFormats": [".mp3", ".wav", ".m4a", ".flac", ".ogg"],
+    "supportedVideoFormats": [".mp4", ".mkv", ".avi", ".mov", ".webm"]
+  },
+  "obsidian": {
+    "enabled": false,
+    "apiUrl": "http://localhost:27123",
+    "vaultPath": "",
+    "apiToken": ""
+  }
+}

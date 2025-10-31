@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meeting Recap Processor</title>
+    <script type="module" src="/main.js" defer></script>
+  </head>
+
+  <body>
+    <div class="app-container">
+      <header>
+        <h1>🎙️ Meeting Recap Processor</h1>
+        <p class="subtitle">Transform recordings into transcripts, analysis, and narrative recaps</p>
+      </header>
+
+      <main class="content">
+        <!-- File Upload Section -->
+        <section class="card">
+          <h2>1. Select Recording</h2>
+          <div class="upload-area" id="upload-area">
+            <div class="upload-content">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <p class="upload-text">Drop recording here or click to browse</p>
+              <p class="upload-hint">Supports MP4, MP3, WAV, M4A, MKV</p>
+            </div>
+            <div class="selected-file" id="selected-file" style="display: none;">
+              <span id="file-name"></span>
+              <button class="btn-remove" id="remove-file">×</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Processing Options -->
+        <section class="card">
+          <h2>2. Processing Options</h2>
+          <div class="options-grid">
+            <div class="option-group">
+              <label for="whisper-model">Whisper Model</label>
+              <select id="whisper-model">
+                <option value="tiny">Tiny (fastest)</option>
+                <option value="base">Base</option>
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium (recommended)</option>
+                <option value="large">Large (most accurate)</option>
+              </select>
+            </div>
+
+            <div class="option-group">
+              <label for="transcription-mode">Transcription Mode</label>
+              <select id="transcription-mode">
+                <option value="local" selected>Local GPU</option>
+                <option value="remote">Remote GPU</option>
+              </select>
+            </div>
+
+            <div class="option-group">
+              <label for="recap-style">Recap Style</label>
+              <select id="recap-style">
+                <option value="epic" selected>Epic</option>
+                <option value="casual">Casual</option>
+                <option value="dramatic">Dramatic</option>
+                <option value="narrative">Narrative</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Remote Whisper Server Configuration -->
+          <div id="remote-whisper-config" class="remote-config" style="display: none;">
+            <h3>Remote Whisper Server</h3>
+            <div class="option-group">
+              <label for="whisper-host">Server Host URL</label>
+              <input type="text" id="whisper-host" placeholder="http://localhost:9000" />
+            </div>
+            <button id="test-whisper-connection" class="btn-secondary">Test Connection</button>
+            <div id="whisper-connection-status" class="connection-status"></div>
+          </div>
+
+          <!-- Remote Ollama Server Configuration -->
+          <div id="remote-ollama-config" class="remote-config" style="display: none;">
+            <h3>Remote Ollama Server</h3>
+            <div class="option-group">
+              <label for="ollama-host">Server Host URL</label>
+              <input type="text" id="ollama-host" placeholder="http://localhost:11434" />
+            </div>
+            <button id="test-ollama-connection" class="btn-secondary">Test Connection</button>
+            <div id="ollama-connection-status" class="connection-status"></div>
+          </div>
+
+          <div class="checkbox-group">
+            <label>
+              <input type="checkbox" id="run-analysis" checked />
+              <span>Run content analysis</span>
+            </label>
+            <label>
+              <input type="checkbox" id="generate-recap" checked />
+              <span>Generate narrative recap</span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Processing Status -->
+        <section class="card">
+          <h2>3. Process</h2>
+          <button id="start-btn" class="btn-primary" disabled>
+            Start Processing
+          </button>
+
+          <div id="progress-section" style="display: none;">
+            <div class="progress-stage">
+              <div class="stage-header">
+                <span id="current-stage">Initializing...</span>
+                <span id="progress-percent">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+              </div>
+              <p class="progress-message" id="progress-message">Preparing to process...</p>
+            </div>
+
+            <div id="results-section" style="display: none;">
+              <h3>✅ Processing Complete!</h3>
+              <div class="results-list" id="results-list"></div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <footer>
+        <p>Powered by Whisper + Ollama + Gemma3n | GPU Accelerated</p>
+      </footer>
+    </div>
+  </body>
+</html>

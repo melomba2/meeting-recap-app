@@ -1,0 +1,475 @@
+#!/usr/bin/env python3
+"""
+Enhanced RTX 5090 Whisper Processor
+- Fixes repetition bug with better parameters
+- Improved GPU utilization
+- Hallucination detection and filtering
+"""
+
+import os
+import sys
+import argparse
+import subprocess
+from pathlib import Path
+from datetime import datetime
+import warnings
+warnings.filterwarnings('ignore')
+
+try:
+    import torch
+    import whisper
+except ImportError:
+    print("Error: Required packages not found.")
+    print("Install them with:")
+    print("  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121")
+    print("  pip install openai-whisper")
+    sys.exit(1)
+
+
+class WhisperProcessor:
+    def __init__(self, model_name="medium", device=None):
+        """
+        Initialize Whisper processor with anti-repetition settings.
+        
+        Args:
+            model_name: Whisper model size
+            device: Computing device (auto-detects CUDA if available)
+        """
+        self.model_name = model_name
+        
+        # Auto-detect best device
+        if device is None:
+            if torch.cuda.is_available():
+                self.device = "cuda"
+                # Enable TF32 for better performance on RTX 5090
+                torch.backends.cuda.matmul.allow_tf32 = True
+                torch.backends.cudnn.allow_tf32 = True
+            else:
+                self.device = "cpu"
+        else:
+            self.device = device
+        
+        self.model = None
+        
+    def check_system(self):
+        """Check system requirements and GPU availability"""
+        print("\n" + "=" * 60)
+        print("System Check")
+        print("=" * 60)
+        
+        # Check PyTorch
+        print(f"PyTorch version: {torch.__version__}")
+        
+        # Check CUDA
+        if torch.cuda.is_available():
+            print(f"✅ CUDA available: {torch.version.cuda}")
+            print(f"✅ GPU: {torch.cuda.get_device_name(0)}")
+            print(f"✅ GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+            print(f"✅ TF32 enabled: {torch.backends.cuda.matmul.allow_tf32}")
+        else:
+            print("⚠️  CUDA not available - will use CPU (slow)")
+        
+        # Check FFmpeg
+        try:
+            result = subprocess.run(['ffmpeg', '-version'], 
+                                  capture_output=True, text=True)
+            if result.returncode == 0:
+                version = result.stdout.split('\n')[0]
+                print(f"✅ FFmpeg: {version.split('version')[1].split()[0]}")
+            else:
+                print("⚠️  FFmpeg not found")
+        except FileNotFoundError:
+            print("❌ FFmpeg not installed")
+            print("   Install: winget install FFmpeg")
+        
+        print("=" * 60 + "\n")
+        
+        return torch.cuda.is_available()
+    
+    def load_model(self):
+        """Load Whisper model with optimizations"""
+        print(f"📥 Loading Whisper model: {self.model_name}")
+        print(f"🖥️  Device: {self.device}")
+        
+        try:
+            self.model = whisper.load_model(self.model_name, device=self.device)
+            
+            if self.device == "cuda":
+                # Optimize for RTX 5090
+                self.model.half()  # Use FP16 for faster processing
+                print("✅ Model loaded with FP16 optimization")
+            else:
+                print("✅ Model loaded (CPU mode)")
+                
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error loading model: {e}")
+            return False
+    
+    def extract_audio(self, video_path, output_path):
+        """Extract audio from video file using FFmpeg"""
+        print(f"\n🎵 Extracting audio from: {video_path}")
+        
+        try:
+            cmd = [
+                'ffmpeg',
+                '-i', str(video_path),
+                '-vn',  # No video
+                '-acodec', 'pcm_s16le',  # PCM 16-bit
+                '-ar', '16000',  # 16kHz sample rate (Whisper's native)
+                '-ac', '1',  # Mono
+                '-y',  # Overwrite
+                str(output_path)
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                print(f"✅ Audio extracted to: {output_path}")
+                return True
+            else:
+                print(f"❌ FFmpeg error: {result.stderr}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error extracting audio: {e}")
+            return False
+    
+    def detect_repetition(self, segments, threshold=0.8):
+        """
+        Detect and filter repetitive segments (hallucination fix).
+        
+        Args:
+            segments: List of transcript segments
+            threshold: Similarity threshold for detecting repetition (0-1)
+        """
+        if not segments:
+            return segments
+        
+        filtered_segments = [segments[0]]  # Keep first segment
+        
+        for i in range(1, len(segments)):
+            current_text = segments[i]['text'].strip().lower()
+            previous_text = segments[i-1]['text'].strip().lower()
+            
+            # Calculate simple similarity (word overlap)
+            current_words = set(current_text.split())
+            previous_words = set(previous_text.split())
+            
+            if current_words and previous_words:
+                overlap = len(current_words & previous_words)
+                similarity = overlap / max(len(current_words), len(previous_words))
+                
+                # Skip if too similar to previous segment
+                if similarity < threshold:
+                    filtered_segments.append(segments[i])
+                else:
+                    print(f"⚠️  Filtered repetition at {segments[i]['start']:.1f}s")
+            else:
+                filtered_segments.append(segments[i])
+        
+        return filtered_segments
+    
+     def transcribe(self, audio_path, language=None):
+         """
+         Transcribe audio with anti-repetition settings.
+         
+         Args:
+             audio_path: Path to audio file
+             language: Force language (None for auto-detect)
+         """
+         print(f"DEBUG: transcribe - audio_path: {audio_path}", file=sys.stderr, flush=True)
+         print(f"DEBUG: File exists: {os.path.exists(audio_path)}", file=sys.stderr, flush=True)
+         if audio_path.exists():
+             print(f"DEBUG: File size: {audio_path.stat().st_size}", file=sys.stderr, flush=True)
+         if self.model is None:
+             print("❌ Model not loaded")
+             return None
+         
+         print(f"\n🎤 Transcribing: {audio_path}")
+         print("⏳ This may take several minutes...")
+         
+         try:
+            # Enhanced transcription options to prevent repetition
+            options = {
+                "language": language,
+                "task": "transcribe",
+                "fp16": self.device == "cuda",
+         # Anti-repetition settings
+         "temperature": 0.0,  # Deterministic output
+         "compression_ratio_threshold": 2.4,  # Detect repetition
+         "logprob_threshold": -1.0,  # Filter low-confidence
+         "no_speech_threshold": 0.6,  # Skip silence
+         "condition_on_previous_text": False,  # Don't condition on previous (reduces repetition)
+         # Improved quality
+         "beam_size": 5,  # Better search
+         "best_of": 5,  # Sample multiple
+         "patience": 1.0,
+         "word_timestamps": True,  # Include word-level timestamps for better processing
+            }
+            
+            # Transcribe
+            result = self.model.transcribe(
+                str(audio_path),
+                **options,
+                verbose=True
+            )
+            
+            # Filter repetitive segments
+            if 'segments' in result:
+                original_count = len(result['segments'])
+                result['segments'] = self.detect_repetition(result['segments'])
+                filtered_count = original_count - len(result['segments'])
+                
+                if filtered_count > 0:
+                    print(f"✅ Filtered {filtered_count} repetitive segments")
+            
+            print("✅ Transcription complete!")
+            return result
+            
+        except Exception as e:
+            print(f"❌ Error during transcription: {e}")
+            return None
+    
+    def save_transcript(self, result, output_path):
+        """Save transcript with timestamps"""
+        print(f"\n💾 Saving transcript to: {output_path}")
+        
+        try:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                # Write header
+                f.write(f"Transcript - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write(f"Model: {self.model_name}\n")
+                f.write(f"Language: {result.get('language', 'auto-detected')}\n")
+                f.write("=" * 60 + "\n\n")
+                
+                # Write segments with timestamps
+                if 'segments' in result:
+                    for segment in result['segments']:
+                        timestamp = f"[{self._format_timestamp(segment['start'])} --> {self._format_timestamp(segment['end'])}]"
+                        f.write(f"{timestamp}\n")
+                        f.write(f"{segment['text'].strip()}\n\n")
+                else:
+                    # Fallback: full text without segments
+                    f.write(result['text'])
+                
+            print(f"✅ Transcript saved!")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error saving transcript: {e}")
+            return False
+    
+     def transcribe_file(self, file_path, output_path):
+         """
+         Transcribe a single file and save the transcript.
+
+         Args:
+             file_path: Path to the input file (video or audio)
+             output_path: Path to save the transcript
+         """
+         print(f"DEBUG: transcribe_file - input: {file_path}, output: {output_path}", file=sys.stderr, flush=True)
+         print(f"DEBUG: File exists: {os.path.exists(file_path)}", file=sys.stderr, flush=True)
+         print(f"DEBUG: Current working directory: {os.getcwd()}", file=sys.stderr, flush=True)
+         input_path = Path(file_path).resolve()
+         output_path = Path(output_path).resolve()
+ 
+         # Check if audio needs to be extracted
+         if input_path.suffix in [".mp4", ".mkv", ".mov"]:
+             audio_path = output_path.with_suffix(".wav")
+             print(f"DEBUG: Extracting audio to {audio_path}", file=sys.stderr, flush=True)
+             if not self.extract_audio(input_path, audio_path):
+                 print(f"❌ Failed to extract audio from {input_path}", file=sys.stderr, flush=True)
+                 return None
+         else:
+             audio_path = input_path
+ 
+         Args:
+             file_path: Path to the input file (video or audio)
+             output_path: Path to save the transcript
+         """
+         print(f"DEBUG: transcribe_file - input: {file_path}, output: {output_path}", file=sys.stderr, flush=True)
+         print(f"DEBUG: File exists: {os.path.exists(file_path)}", file=sys.stderr, flush=True)
+         input_path = Path(file_path)
+         output_path = Path(output_path)
+ 
+         # Check if audio needs to be extracted
+         if input_path.suffix in [".mp4", ".mkv", ".mov"]:
+             audio_path = output_path.with_suffix(".wav")
+             print(f"DEBUG: Extracting audio to {audio_path}", file=sys.stderr, flush=True)
+             if not self.extract_audio(input_path, audio_path):
+                 print(f"❌ Failed to extract audio from {input_path}", file=sys.stderr, flush=True)
+                 return None
+         else:
+             audio_path = input_path
+ 
+        # Transcribe the audio
+        result = self.transcribe(audio_path)
+        if not result:
+            return None
+
+        # Save the transcript
+        if not self.save_transcript(result, output_path):
+            return None
+
+        # Clean up temporary audio file
+        if audio_path != input_path and audio_path.exists():
+            audio_path.unlink()
+
+        return str(output_path)
+
+    def _format_timestamp(self, seconds):
+        """Format seconds as HH:MM:SS"""
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        secs = int(seconds % 60)
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Enhanced RTX 5090 Whisper Processor with repetition fix",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Process with default settings (medium model, anti-repetition)
+  python rtx5090_processor.py recordings/meeting.mp4
+
+  # Use large model for better accuracy
+  python rtx5090_processor.py recordings/meeting.mp4 --model large-v3
+
+  # Force English language
+  python rtx5090_processor.py recordings/meeting.mp4 --language en
+
+  # Check system
+  python rtx5090_processor.py --check
+
+Model sizes:
+  tiny   - Fastest, least accurate (~1GB VRAM)
+  base   - Fast, good for testing (~1GB VRAM)
+  small  - Balanced (~2GB VRAM)
+  medium - Recommended default (~5GB VRAM)
+  large  - Best quality (~10GB VRAM)
+  large-v3 - Latest, highest quality (~10GB VRAM)
+        """
+    )
+    
+    parser.add_argument(
+        'input',
+        nargs='?',
+        help='Input video file (MP4, etc.)'
+    )
+    
+    parser.add_argument(
+        '--model',
+        default='medium',
+        choices=['tiny', 'base', 'small', 'medium', 'large', 'large-v3'],
+        help='Whisper model size (default: medium)'
+    )
+    
+    parser.add_argument(
+        '--language',
+        help='Force language (e.g., en, es, fr). Leave blank for auto-detect'
+    )
+    
+    parser.add_argument(
+        '--keep-audio',
+        action='store_true',
+        default=True,
+        help='Keep extracted WAV file (default: True)'
+    )
+    
+    parser.add_argument(
+        '--check',
+        action='store_true',
+        help='Check system status and GPU availability'
+    )
+    
+    args = parser.parse_args()
+    
+    # Initialize processor
+    processor = WhisperProcessor(model_name=args.model)
+    
+    # Check system if requested
+    if args.check:
+        processor.check_system()
+        return
+    
+    # Require input file
+    if not args.input:
+        parser.print_help()
+        return
+    
+    # Verify input exists
+    input_path = Path(args.input)
+    if not input_path.exists():
+        print(f"❌ Error: Input file not found: {input_path}")
+        return
+    
+    # Setup paths
+    project_root = input_path.parent.parent
+    audio_dir = project_root / "audio"
+    transcript_dir = project_root / "transcripts"
+    
+    # Create directories
+    audio_dir.mkdir(exist_ok=True)
+    transcript_dir.mkdir(exist_ok=True)
+    
+    # Output paths
+    audio_path = audio_dir / f"{input_path.stem}.wav"
+    transcript_path = transcript_dir / f"{input_path.stem}.txt"
+    
+    # Print configuration
+    print("\n" + "=" * 60)
+    print("RTX 5090 Whisper Processor (Anti-Repetition)")
+    print("=" * 60)
+    print(f"Input: {input_path}")
+    print(f"Model: {args.model}")
+    print(f"Language: {args.language or 'auto-detect'}")
+    print(f"Audio output: {audio_path}")
+    print(f"Transcript output: {transcript_path}")
+    print("=" * 60)
+    
+    # Check system
+    has_cuda = processor.check_system()
+    if not has_cuda:
+        print("⚠️  Warning: Running on CPU will be very slow!")
+        response = input("Continue? (y/n): ")
+        if response.lower() != 'y':
+            return
+    
+    # Extract audio
+    if not processor.extract_audio(input_path, audio_path):
+        print("❌ Failed to extract audio")
+        return
+    
+    # Load model
+    if not processor.load_model():
+        print("❌ Failed to load model")
+        return
+    
+    # Transcribe
+    result = processor.transcribe(audio_path, language=args.language)
+    if not result:
+        print("❌ Transcription failed")
+        return
+    
+    # Save transcript
+    if not processor.save_transcript(result, transcript_path):
+        print("❌ Failed to save transcript")
+        return
+    
+    # Cleanup audio if requested
+    if not args.keep_audio and audio_path.exists():
+        audio_path.unlink()
+        print(f"🗑️  Removed temporary audio file")
+    
+    print("\n✨ Processing complete!")
+    print(f"📄 Transcript: {transcript_path}")
+    if args.keep_audio:
+        print(f"🎵 Audio: {audio_path}")
+
+
+if __name__ == "__main__":
+    main()

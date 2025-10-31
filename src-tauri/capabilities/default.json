@@ -1,0 +1,15 @@
+{
+  "$schema": "https://tauri.app/v2/schemas/capability.schema.json",
+  "identifier": "default",
+  "description": "Capability for the main application window",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:default",
+    "core:window:allow-set-title",
+    "core:event:default",
+    "dialog:allow-open",
+    "dialog:allow-message",
+    "dialog:default"
+  ]
+}
