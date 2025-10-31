@@ -55,7 +55,7 @@ jobs:
 
             ✨ New features, improvements, and bug fixes in this release.
 
-            See [commits](https://github.com/yourusername/meeting-recap-app/compare/${{ steps.tag_name.outputs.tag }}...latest) for more details.
+            See [commits](https://github.com/melomba2/meeting-recap-app/compare/${{ steps.tag_name.outputs.tag }}...latest) for more details.
 
             ## Installation
 
@@ -69,7 +69,7 @@ jobs:
 
             1. Download the binary for your OS
             2. Run the installer
-            3. Follow the setup instructions in [README.md](https://github.com/yourusername/meeting-recap-app#quick-start)
+            3. Follow the setup instructions in [README.md](https://github.com/melomba2/meeting-recap-app#quick-start)
             4. Install [Ollama](https://ollama.ai) if you haven't already
             5. Start using the app!
 
@@ -80,19 +80,19 @@ jobs:
             - **Python**: 3.10+ (auto-installed with setup script)
             - **Ollama**: Required for analysis/recap generation
 
-            See [README.md](https://github.com/yourusername/meeting-recap-app#system-requirements) for full requirements.
+            See [README.md](https://github.com/melomba2/meeting-recap-app#system-requirements) for full requirements.
 
             ## Known Issues
 
             - Unsigned binaries on macOS/Windows (will show security warnings)
             - Very large files (>2GB) may require chunking
-            - See [Issues](https://github.com/yourusername/meeting-recap-app/issues) for known bugs
+            - See [Issues](https://github.com/melomba2/meeting-recap-app/issues) for known bugs
 
             ## Support
 
-            - 📚 [Setup Guide](https://github.com/yourusername/meeting-recap-app/blob/main/SETUP_SERVERS.md)
-            - 💬 [Discussions](https://github.com/yourusername/meeting-recap-app/discussions)
-            - 🐛 [Report Issues](https://github.com/yourusername/meeting-recap-app/issues)
+            - 📚 [Setup Guide](https://github.com/melomba2/meeting-recap-app/blob/main/SETUP_SERVERS.md)
+            - 💬 [Discussions](https://github.com/melomba2/meeting-recap-app/discussions)
+            - 🐛 [Report Issues](https://github.com/melomba2/meeting-recap-app/issues)
 
             ---
 

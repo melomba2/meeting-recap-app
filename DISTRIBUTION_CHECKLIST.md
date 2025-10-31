@@ -252,7 +252,7 @@ This document tracks the readiness of Meeting Recap App for public GitHub distri
 
 ### Before Public Release
 
-1. **Update URLs in docs** (if different from `yourusername`):
+1. **Update URLs in docs** (if different from `melomba2`):
    - README.md: GitHub repo links
    - SETUP_SERVERS.md: Links to issues/discussions
    - CONTRIBUTING.md: Support links

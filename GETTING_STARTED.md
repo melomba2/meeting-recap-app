@@ -24,7 +24,7 @@ Make sure you have:
 
 ## Step 1: Download the App
 
-Visit the [releases page](https://github.com/yourusername/meeting-recap-app/releases) and download the version for your operating system:
+Visit the [releases page](https://github.com/melomba2/meeting-recap-app/releases) and download the version for your operating system:
 
 - **macOS**: Download the `.dmg` file
 - **Windows**: Download the `.msi` installer
@@ -171,8 +171,8 @@ If something goes wrong:
 
 1. **Check the Settings** → Test Connection buttons
 2. **See [Troubleshooting](README.md#troubleshooting)** in the full README
-3. **Report a bug**: [GitHub Issues](https://github.com/yourusername/meeting-recap-app/issues)
-4. **Ask questions**: [GitHub Discussions](https://github.com/yourusername/meeting-recap-app/discussions)
+3. **Report a bug**: [GitHub Issues](https://github.com/melomba2/meeting-recap-app/issues)
+4. **Ask questions**: [GitHub Discussions](https://github.com/melomba2/meeting-recap-app/discussions)
 
 ---
 
@@ -189,4 +189,4 @@ Once you're comfortable with the basics:
 
 **Happy transcribing! 🎙️**
 
-Questions? Join our [Discussions](https://github.com/yourusername/meeting-recap-app/discussions) or [open an issue](https://github.com/yourusername/meeting-recap-app/issues).
+Questions? Join our [Discussions](https://github.com/melomba2/meeting-recap-app/discussions) or [open an issue](https://github.com/melomba2/meeting-recap-app/issues).

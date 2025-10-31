@@ -652,4 +652,4 @@ A: ~5-10GB per model. Whisper models vary, typically 2-3GB.
 - Check app logs: Browser DevTools (F12) → Console tab
 - Test server directly: Use `curl` commands from this guide
 - Check server logs: Look at terminal where server is running
-- Open an issue: https://github.com/yourusername/meeting-recap-app/issues
+- Open an issue: https://github.com/melomba2/meeting-recap-app/issues

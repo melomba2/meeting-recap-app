@@ -60,7 +60,7 @@ Interested in coding? Follow these steps:
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/yourusername/meeting-recap-app.git
+git clone https://github.com/melomba2/meeting-recap-app.git
 cd meeting-recap-app
 
 # 2. Create feature branch

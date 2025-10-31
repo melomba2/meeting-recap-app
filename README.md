@@ -5,8 +5,8 @@ Transform your meeting and gaming session recordings into transcripts, structure
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: macOS | Windows | Linux](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-blue)]()
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
-[![Latest Release](https://img.shields.io/badge/Release-v0.1.0-green.svg)](https://github.com/yourusername/meeting-recap-app/releases/tag/v0.1.0)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/yourusername/meeting-recap-app/build.yml?branch=main&label=Build)](https://github.com/yourusername/meeting-recap-app/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/badge/Release-v0.1.0-green.svg)](https://github.com/melomba2/meeting-recap-app/releases/tag/v0.1.0)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/melomba2/meeting-recap-app/build.yml?branch=main&label=Build)](https://github.com/melomba2/meeting-recap-app/actions/workflows/build.yml)
 [![Status: Stable](https://img.shields.io/badge/Status-Stable-brightgreen)]()
 
 ## Features
@@ -48,7 +48,7 @@ Transform your meeting and gaming session recordings into transcripts, structure
 
 #### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/yourusername/meeting-recap-app.git
+git clone https://github.com/melomba2/meeting-recap-app.git
 cd meeting-recap-app
 ```
 
@@ -219,7 +219,7 @@ To offload transcription to a powerful GPU machine:
 - Update Rust: `rustup update`
 - Delete `node_modules` and reinstall: `rm -rf node_modules && npm install`
 
-For more issues, check the [Discussions](https://github.com/yourusername/meeting-recap-app/discussions) or open an [Issue](https://github.com/yourusername/meeting-recap-app/issues).
+For more issues, check the [Discussions](https://github.com/melomba2/meeting-recap-app/discussions) or open an [Issue](https://github.com/melomba2/meeting-recap-app/issues).
 
 ## System Requirements
 
@@ -296,8 +296,8 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ## Support
 
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/meeting-recap-app/discussions)
-- 🐛 **Report Issues**: [GitHub Issues](https://github.com/yourusername/meeting-recap-app/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/melomba2/meeting-recap-app/discussions)
+- 🐛 **Report Issues**: [GitHub Issues](https://github.com/melomba2/meeting-recap-app/issues)
 - 📚 **Documentation**: [Setup Guide](SETUP_SERVERS.md) | [Contributing](CONTRIBUTING.md)
 
 ## Acknowledgments

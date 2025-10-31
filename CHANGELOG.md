@@ -186,10 +186,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 ## Support
 
 - 📖 [Setup Guide](SETUP_SERVERS.md)
-- 💬 [Discussions](https://github.com/yourusername/meeting-recap-app/discussions)
-- 🐛 [Report Issues](https://github.com/yourusername/meeting-recap-app/issues)
+- 💬 [Discussions](https://github.com/melomba2/meeting-recap-app/discussions)
+- 🐛 [Report Issues](https://github.com/melomba2/meeting-recap-app/issues)
 - 📧 Direct contact via GitHub
 
 ---
 
-**Note:** Replace `yourusername` with your actual GitHub username in links.
+**Note:** Replace `melomba2` with your actual GitHub username in links.
